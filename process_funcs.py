@@ -4,7 +4,7 @@ import numpy as np
 
 def get_product_type(df):
     product_type_list = ("有余卡",  "天翼不限量129元套餐", "天翼不限量",
-                         "磅礴卡", "日租卡d", "大王卡",
+                         "磅礴卡", "日租卡", "大王卡",
                          "iFree+", "iFree4G", "先锋卡",
                          "人悦卡")
     k = df["商品名称"]
@@ -28,6 +28,7 @@ def get_manager(df):
         "宋飞": ("北京光迅互联", "北京吉利创想", "珠峰讯", "天恒信通", "蚂蚁聚力"),
         "赵德隆": ("济南八骏", "亚信科技", "北京捷康特光", "天拓数信", "山东尊为")
     }
+
     agent_target = df["代理商名称"]
     manager = "未匹配"
     for name, agents_list in manager_mapping_list.items():
@@ -40,6 +41,30 @@ def get_manager(df):
 def add_manager(df):
     manager_series = df.apply(get_manager, axis=1)
     df["渠道经理"] = manager_series
+
+
+def add_manager2(df):
+    manager_mapping_list2 = {
+        "上海缘聚": "蒋伟男",
+        "北京乐卡": "蒋伟男",
+        "南京移宝": "蒋伟男",
+        "落基伟业": "蒋伟男",
+        "天为畅游": "蒋伟男",
+        "广州粤亮": "李天阳",
+        "京东商城": "李天阳",
+        "中国邮电器材": "李天阳",
+        "济南八骏": "赵德隆",
+        "亚信科技": "赵德隆",
+        "北京捷康特光": "赵德隆",
+        "天拓数信": "赵德隆",
+        "山东尊为": "赵德隆",
+        "北京光迅互联": "宋飞",
+        "北京吉利创想": "宋飞",
+        "珠峰讯": "宋飞",
+        "天恒信通": "宋飞",
+        "蚂蚁聚力": "宋飞"
+    }
+    df["渠道经理2"] = df["代理商名称"].map(manager_mapping_list2)
 
 
 def to_excel_utf8(df, filename):
