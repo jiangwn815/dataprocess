@@ -94,3 +94,8 @@ def divide_file(filename, col_name):
         divided_data = df[df[col_name] == item]
         divided_filename = filename.split(".")[0]+"拆分-"+str(item)
         to_excel_utf8(divided_data,divided_filename)
+
+
+def convert_to_float(df):
+    df = df.applymap(lambda x: str(x).replace(",", ""))
+    df = pd.DataFrame(df, dtype=np.float)
