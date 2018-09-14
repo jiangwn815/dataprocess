@@ -75,12 +75,16 @@ def to_excel_utf8(df, filename):
 
 def read_agent_file(filetype, date_start, date_end, year_start="2018", year_end="2018", ext="xls"):
     file_date_part = year_start+date_start+"-"+year_end+date_end+"."+ext
-    filename = ""
-    if filetype == "sent":
-        filename = "代理商已发货数据"+file_date_part
-    elif filetype == "mobile":
-        filename = "代理商号码" + file_date_part
-    df = pd.read_excel(filename)
+    file_type_part = {
+        "sent": "代理商已发货数据",
+        "mobile": "代理商号码"
+    }
+    ext_func = {
+        "xls": pd.read_excel,
+        "csv": pd.read_csv
+    }
+    filename = file_type_part[filetype]+file_date_part
+    df = ext_func[ext](filename)
     add_manager(df)
     if filetype == "sent":
         add_product_type(df)
