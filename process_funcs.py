@@ -43,6 +43,9 @@ def add_manager(df):
     df["渠道经理"] = manager_series
 
 
+
+
+
 def add_manager2(df):
     manager_mapping_list2 = {
         "上海缘聚": "蒋伟男",
