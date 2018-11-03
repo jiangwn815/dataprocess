@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import os
+import chardet
 
 
 def get_product_type(df):
@@ -108,3 +110,55 @@ def divide_file(filename, col_name):
 def convert_to_float(df):
     df = df.applymap(lambda x: str(x).replace(",", ""))
     df = pd.DataFrame(df, dtype=np.float)
+
+
+def find_files(dir_name, filetype="xls"):
+    file_list = [f for f in os.listdir(dir_name) if os.path.splitext(f)[1] == "."+filetype]
+    for file_name in file_list:
+        print(file_name)
+        ext_func = {
+            "xls": pd.read_excel,
+            "xlsx": pd.read_excel,
+            "csv": pd.read_csv
+        }
+        try:
+            df = ext_func[filetype](dir_name+"/"+file_name, encoding="gbk")
+        except UnicodeDecodeError:
+            df = ext_func[filetype](dir_name + "/" + file_name, encoding="utf_8_sig")
+        print(df.head())
+
+
+def merge_files(dir_name=".", ext="xls", st=""):
+    df = pd.DataFrame({})
+    ext_func = {
+        "xls": pd.read_excel,
+        "xlsx": pd.read_excel,
+        "csv": pd.read_csv
+    }
+    passed_files = []
+    processed_files = []
+    for f in os.listdir(dir_name):
+        if not f.startswith(st) or not f.endswith(ext):
+            #print(f+" is passed")
+            passed_files.append(f)
+            continue
+        processed_files.append(f)
+        paras = {}
+        if ext == "csv":
+            paras["low_memory"] = False
+        with open(os.path.join(dir_name, f), "rb") as file_obj:
+            data = file_obj.readline()
+            code = chardet.detect(data)["encoding"]
+            paras["encoding"] = "utf_8_sig"
+            if code == "GB2312":
+                paras["encoding"] = "gbk"
+        print("Working on:"+f, " With ", paras)
+
+        xf = ext_func[ext](os.path.join(dir_name, f), **paras)
+        xf.fillna({"代理商id": 99999, "用户Id": 999999999999, "代理商编码": "HZDL-00000"})
+        df = df.append(xf, sort=True)
+        print(df.head())
+    #print("Passed files:", passed_files)
+    print("Processed files:", processed_files)
+
+    return df
