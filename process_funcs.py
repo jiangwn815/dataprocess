@@ -135,30 +135,31 @@ def merge_files(dir_name=".", ext="xls", st=""):
         "xlsx": pd.read_excel,
         "csv": pd.read_csv
     }
-    passed_files = []
-    processed_files = []
+    passed_files = []  # 存储过滤掉的文件
+    processed_files = []  # 存储处理的文件
     for f in os.listdir(dir_name):
+        #  不符合要求的文件pass掉
         if not f.startswith(st) or not f.endswith(ext):
             #print(f+" is passed")
             passed_files.append(f)
             continue
         processed_files.append(f)
-        paras = {}
+        paras = {}  # 存储对文件所执行函数的参数
         if ext == "csv":
             paras["low_memory"] = False
+        # 判断文件编码类型
         with open(os.path.join(dir_name, f), "rb") as file_obj:
             data = file_obj.readline()
             code = chardet.detect(data)["encoding"]
             paras["encoding"] = "utf_8_sig"
             if code == "GB2312":
-                paras["encoding"] = "gbk"
+                paras["encoding"] = "gbk" # 选用gb2312的超集
         print("Working on:"+f, " With ", paras)
 
-        xf = ext_func[ext](os.path.join(dir_name, f), **paras)
+        xf = ext_func[ext](os.path.join(dir_name, f), **paras)  # 读入文件
         xf.fillna({"代理商id": 99999, "用户Id": 999999999999, "代理商编码": "HZDL-00000"})
         df = df.append(xf, sort=True)
         print(df.head())
-    #print("Passed files:", passed_files)
     print("Processed files:", processed_files)
 
     return df
