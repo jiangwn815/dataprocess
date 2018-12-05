@@ -157,9 +157,12 @@ def merge_files(dir_name=".", ext="xls", st=""):
         print("Working on:"+f, " With ", paras)
 
         xf = ext_func[ext](os.path.join(dir_name, f), **paras)  # 读入文件
-        xf.fillna({"代理商id": 99999, "用户Id": 999999999999, "代理商编码": "HZDL-00000"})
+        print(xf.head()["用户Id"])
+        #print("ss", xf[~xf["用户状态"].isnull()])
+        xf.fillna(value={"代理商id": 99999, "用户Id": 999999999, "代理商编码": "HZDL-00000"}, inplace=True)
+        xf["用户Id"].astype('int64')
         df = df.append(xf, sort=True)
-        print(df.head())
+        print(df.head()["用户Id"])
     print("Processed files:", processed_files)
 
     return df
