@@ -159,10 +159,11 @@ def merge_files(dir_name=".", ext="xls", st=""):
         xf = ext_func[ext](os.path.join(dir_name, f), **paras)  # 读入文件
         #print("ss", xf[~xf["用户状态"].isnull()])
         xf.fillna(value={"代理商id": 99999, "用户Id": 999999999, "代理商编码": "HZDL-00000"}, inplace=True)
-        xf["用户Id"].replace('空', 999999999, inplace=True)
-        xf["用户Id"] = xf["用户Id"].astype('int64')  # 强制转换为int 以免成为float格式导致科学计数法
+        if "用户Id" in xf.columns.values:
+            xf["用户Id"].replace('空', 999999999, inplace=True)
+            xf["用户Id"] = xf["用户Id"].astype('int64')  # 强制转换为int 以免成为float格式导致科学计数法
         df = df.append(xf, sort=True)  # 连接不同的表
-        print(df.head()["用户Id"])
+
     print("Processed files:", processed_files)
 
     return df
