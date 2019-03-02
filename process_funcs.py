@@ -45,9 +45,6 @@ def add_manager(df):
     df["渠道经理"] = manager_series
 
 
-
-
-
 def add_manager2(df):
     manager_mapping_list2 = {
         "上海缘聚": "蒋伟男",
@@ -157,12 +154,16 @@ def merge_files(dir_name=".", ext="xls", st=""):
         print("读入:"+f, " With ","参数：",paras)
 
         xf = ext_func[ext](os.path.join(dir_name, f), **paras)  # 读入文件
-        #print("ss", xf[~xf["用户状态"].isnull()])
+        xf.rename(columns={"用户ID": "用户Id", "用户id": "用户Id"}, inplace=True)
         xf.fillna(value={"代理商id": 99999, "用户Id": 999999999, "代理商编码": "HZDL-00000"}, inplace=True)
+
         if "用户Id" in xf.columns.values:
             xf["用户Id"].replace('空', 999999999, inplace=True)
             xf["用户Id"] = xf["用户Id"].astype('int64')  # 强制转换为int 以免成为float格式导致科学计数法
+        print(xf.head().iloc[:, 6:9])
         df = df.append(xf, sort=True)  # 连接不同的表
+        print(df.head().iloc[:, 6:9])
+        print("*****************")
 
     print("Processed files:", processed_files)
 
